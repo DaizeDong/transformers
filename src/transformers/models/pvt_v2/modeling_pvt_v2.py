@@ -17,14 +17,13 @@
 """PyTorch PVTv2 model."""
 
 import math
-from typing import Optional, Tuple, Union
+from typing import Optional, Union
 
 import torch
-import torch.utils.checkpoint
 from torch import nn
-from torch.nn import BCEWithLogitsLoss, CrossEntropyLoss, MSELoss
 
 from ...activations import ACT2FN
+from ...modeling_layers import GradientCheckpointingLayer
 from ...modeling_outputs import BackboneOutput, BaseModelOutput, ImageClassifierOutput
 from ...modeling_utils import PreTrainedModel
 from ...pytorch_utils import find_pruneable_heads_and_indices, prune_linear_layer
@@ -41,11 +40,6 @@ def drop_path(input: torch.Tensor, drop_prob: float = 0.0, training: bool = Fals
     """
     Drop paths (Stochastic Depth) per sample (when applied in main path of residual blocks).
 
-    Comment by Ross Wightman: This is the same as the DropConnect impl I created for EfficientNet, etc networks,
-    however, the original name is misleading as 'Drop Connect' is a different form of dropout in a separate paper...
-    See discussion: https://github.com/tensorflow/tpu/issues/494#issuecomment-532968956 ... I've opted for changing the
-    layer and argument names to 'drop path' rather than mix DropConnect as a layer name and use 'survival rate' as the
-    argument.
     """
     if drop_prob == 0.0 or not training:
         return input
@@ -69,7 +63,7 @@ class PvtV2DropPath(nn.Module):
         return drop_path(hidden_states, self.drop_prob, self.training)
 
     def extra_repr(self) -> str:
-        return "p={}".format(self.drop_prob)
+        return f"p={self.drop_prob}"
 
 
 class PvtV2OverlapPatchEmbeddings(nn.Module):
@@ -169,7 +163,7 @@ class PvtV2SelfAttention(nn.Module):
         height: int,
         width: int,
         output_attentions: bool = False,
-    ) -> Tuple[torch.Tensor]:
+    ) -> tuple[torch.Tensor]:
         batch_size, seq_len, num_channels = hidden_states.shape
         query_layer = self.transpose_for_scores(self.query(hidden_states))
 
@@ -300,7 +294,7 @@ class PvtV2BlockLayer(nn.Module):
         return outputs
 
 
-class PvtV2EncoderLayer(nn.Module):
+class PvtV2EncoderLayer(GradientCheckpointingLayer):
     def __init__(self, config: PvtV2Config, layer_idx: int):
         super().__init__()
         self.patch_embedding = PvtV2OverlapPatchEmbeddings(
@@ -360,17 +354,14 @@ class PvtV2Encoder(nn.Module):
         output_attentions: Optional[bool] = False,
         output_hidden_states: Optional[bool] = False,
         return_dict: Optional[bool] = True,
-    ) -> Union[Tuple, BaseModelOutput]:
+    ) -> Union[tuple, BaseModelOutput]:
         all_hidden_states = () if output_hidden_states else None
         all_self_attentions = () if output_attentions else None
 
         batch_size = pixel_values.shape[0]
         hidden_states = pixel_values
         for idx, layer in enumerate(self.layers):
-            if self.gradient_checkpointing and self.training:
-                layer_output = self._gradient_checkpointing_func(layer.__call__, hidden_states, output_attentions)
-            else:
-                layer_output = layer(hidden_states, output_attentions)
+            layer_output = layer(hidden_states, output_attentions)
             outputs, height, width = layer_output
             hidden_states = outputs[0]
             if output_attentions:
@@ -390,7 +381,7 @@ class PvtV2Encoder(nn.Module):
 
 @auto_docstring
 class PvtV2PreTrainedModel(PreTrainedModel):
-    config_class = PvtV2Config
+    config: PvtV2Config
     base_model_prefix = "pvt_v2"
     main_input_name = "pixel_values"
     supports_gradient_checkpointing = True
@@ -441,7 +432,7 @@ class PvtV2Model(PvtV2PreTrainedModel):
         output_attentions: Optional[bool] = None,
         output_hidden_states: Optional[bool] = None,
         return_dict: Optional[bool] = None,
-    ) -> Union[Tuple, BaseModelOutput]:
+    ) -> Union[tuple, BaseModelOutput]:
         output_attentions = output_attentions if output_attentions is not None else self.config.output_attentions
         output_hidden_states = (
             output_hidden_states if output_hidden_states is not None else self.config.output_hidden_states
@@ -526,26 +517,7 @@ class PvtV2ForImageClassification(PvtV2PreTrainedModel):
 
         loss = None
         if labels is not None:
-            if self.config.problem_type is None:
-                if self.num_labels == 1:
-                    self.config.problem_type = "regression"
-                elif self.num_labels > 1 and (labels.dtype == torch.long or labels.dtype == torch.int):
-                    self.config.problem_type = "single_label_classification"
-                else:
-                    self.config.problem_type = "multi_label_classification"
-
-            if self.config.problem_type == "regression":
-                loss_fct = MSELoss()
-                if self.num_labels == 1:
-                    loss = loss_fct(logits.squeeze(), labels.squeeze())
-                else:
-                    loss = loss_fct(logits, labels)
-            elif self.config.problem_type == "single_label_classification":
-                loss_fct = CrossEntropyLoss()
-                loss = loss_fct(logits.view(-1, self.num_labels), labels.view(-1))
-            elif self.config.problem_type == "multi_label_classification":
-                loss_fct = BCEWithLogitsLoss()
-                loss = loss_fct(logits, labels)
+            loss = self.loss_function(labels, logits, self.config)
 
         if not return_dict:
             output = (logits,) + outputs[1:]

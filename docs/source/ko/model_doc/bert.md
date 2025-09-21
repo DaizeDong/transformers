@@ -27,7 +27,7 @@ rendered properly in your Markdown viewer.
 
 ## 개요[[Overview]]
 
-BERT 모델은 Jacob Devlin. Ming-Wei Chang, Kenton Lee, Kristina Touranova가 제안한 논문 [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://arxiv.org/abs/1810.04805)에서 소개되었습니다. BERT는 사전 학습된 양방향 트랜스포머로,  Toronto Book Corpus와 Wikipedia로 구성된 대규모 코퍼스에서 마스킹된 언어 모델링과 다음 문장 예측(Next Sentence Prediction) 목표를 결합해 학습되었습니다.
+BERT 모델은 Jacob Devlin. Ming-Wei Chang, Kenton Lee, Kristina Touranova가 제안한 논문 [BERT: Pre-training of Deep Bidirectional Transformers for Language Understanding](https://huggingface.co/papers/1810.04805)에서 소개되었습니다. BERT는 사전 학습된 양방향 트랜스포머로,  Toronto Book Corpus와 Wikipedia로 구성된 대규모 코퍼스에서 마스킹된 언어 모델링과 다음 문장 예측(Next Sentence Prediction) 목표를 결합해 학습되었습니다.
 
 해당 논문의 초록입니다:
 
@@ -58,7 +58,7 @@ Pytorch는 `torch.nn.functional`의 일부로 Scaled Dot Product Attention(SDPA)
 ```
 from transformers import BertModel
 
-model = BertModel.from_pretrained("bert-base-uncased", torch_dtype=torch.float16, attn_implementation="sdpa")
+model = BertModel.from_pretrained("bert-base-uncased", dtype=torch.float16, attn_implementation="sdpa")
 ...
 ```
 
@@ -172,23 +172,11 @@ BERT를 시작하는 데 도움이 되는 Hugging Face와 community 자료 목�
 [[autodoc]] BertTokenizerFast
 
 </pt>
-<tf>
-
-## TFBertTokenizer
-
-[[autodoc]] TFBertTokenizer
-
-</tf>
 </frameworkcontent>
 
 ## Bert specific outputs
 
 [[autodoc]] models.bert.modeling_bert.BertForPreTrainingOutput
-
-[[autodoc]] models.bert.modeling_tf_bert.TFBertForPreTrainingOutput
-
-[[autodoc]] models.bert.modeling_flax_bert.FlaxBertForPreTrainingOutput
-
 
 <frameworkcontent>
 <pt>
@@ -239,102 +227,6 @@ BERT를 시작하는 데 도움이 되는 Hugging Face와 community 자료 목�
     - forward
 
 </pt>
-<tf>
-
-## TFBertModel
-
-[[autodoc]] TFBertModel
-    - call
-
-## TFBertForPreTraining
-
-[[autodoc]] TFBertForPreTraining
-    - call
-
-## TFBertModelLMHeadModel
-
-[[autodoc]] TFBertLMHeadModel
-    - call
-
-## TFBertForMaskedLM
-
-[[autodoc]] TFBertForMaskedLM
-    - call
-
-## TFBertForNextSentencePrediction
-
-[[autodoc]] TFBertForNextSentencePrediction
-    - call
-
-## TFBertForSequenceClassification
-
-[[autodoc]] TFBertForSequenceClassification
-    - call
-
-## TFBertForMultipleChoice
-
-[[autodoc]] TFBertForMultipleChoice
-    - call
-
-## TFBertForTokenClassification
-
-[[autodoc]] TFBertForTokenClassification
-    - call
-
-## TFBertForQuestionAnswering
-
-[[autodoc]] TFBertForQuestionAnswering
-    - call
-
-</tf>
-<jax>
-
-## FlaxBertModel
-
-[[autodoc]] FlaxBertModel
-    - __call__
-
-## FlaxBertForPreTraining
-
-[[autodoc]] FlaxBertForPreTraining
-    - __call__
-
-## FlaxBertForCausalLM
-
-[[autodoc]] FlaxBertForCausalLM
-    - __call__
-
-## FlaxBertForMaskedLM
-
-[[autodoc]] FlaxBertForMaskedLM
-    - __call__
-
-## FlaxBertForNextSentencePrediction
-
-[[autodoc]] FlaxBertForNextSentencePrediction
-    - __call__
-
-## FlaxBertForSequenceClassification
-
-[[autodoc]] FlaxBertForSequenceClassification
-    - __call__
-
-## FlaxBertForMultipleChoice
-
-[[autodoc]] FlaxBertForMultipleChoice
-    - __call__
-
-## FlaxBertForTokenClassification
-
-[[autodoc]] FlaxBertForTokenClassification
-    - __call__
-
-## FlaxBertForQuestionAnswering
-
-[[autodoc]] FlaxBertForQuestionAnswering
-    - __call__
-
-</jax>
 </frameworkcontent>
 
 

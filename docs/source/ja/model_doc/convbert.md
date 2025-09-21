@@ -27,7 +27,7 @@ rendered properly in your Markdown viewer.
 
 ## Overview
 
-ConvBERT モデルは、[ConvBERT: Improving BERT with Span-based Dynamic Convolution](https://arxiv.org/abs/2008.02496) で Zihang Jiang、Weihao Yu、Daquan Zhou、Yunpeng Chen、Jiashi Feng、Shuicheng Yan によって提案されました。
+ConvBERT モデルは、[ConvBERT: Improving BERT with Span-based Dynamic Convolution](https://huggingface.co/papers/2008.02496) で Zihang Jiang、Weihao Yu、Daquan Zhou、Yunpeng Chen、Jiashi Feng、Shuicheng Yan によって提案されました。
 やん。
 
 論文の要約は次のとおりです。
@@ -53,7 +53,7 @@ ConvBERT トレーニングのヒントは BERT のヒントと似ています�
 
 ## Resources
 
-- [テキスト分類タスクガイド](../tasks/sequence_classification)
+- [テキスト分類タスクガイド(英語版)](../../en/tasks/sequence_classification)
 - [トークン分類タスクガイド](../tasks/token_classification)
 - [質問回答タスク ガイド](../tasks/question_answering)
 - [マスクされた言語モデリング タスク ガイド](../tasks/masked_lang_modeling)
@@ -109,37 +109,4 @@ ConvBERT トレーニングのヒントは BERT のヒントと似ています�
     - forward
 
 </pt>
-<tf>
-
-## TFConvBertModel
-
-[[autodoc]] TFConvBertModel
-    - call
-
-## TFConvBertForMaskedLM
-
-[[autodoc]] TFConvBertForMaskedLM
-    - call
-
-## TFConvBertForSequenceClassification
-
-[[autodoc]] TFConvBertForSequenceClassification
-    - call
-
-## TFConvBertForMultipleChoice
-
-[[autodoc]] TFConvBertForMultipleChoice
-    - call
-
-## TFConvBertForTokenClassification
-
-[[autodoc]] TFConvBertForTokenClassification
-    - call
-
-## TFConvBertForQuestionAnswering
-
-[[autodoc]] TFConvBertForQuestionAnswering
-    - call
-
-</tf>
 </frameworkcontent>

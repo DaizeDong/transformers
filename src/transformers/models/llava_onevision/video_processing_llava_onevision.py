@@ -14,26 +14,14 @@
 # limitations under the License.
 """Video processor class for LLaVa-Onevision."""
 
-from ...image_utils import (
-    OPENAI_CLIP_MEAN,
-    OPENAI_CLIP_STD,
-)
+from ...image_utils import OPENAI_CLIP_MEAN, OPENAI_CLIP_STD, PILImageResampling
 from ...processing_utils import Unpack, VideosKwargs
-from ...utils import is_vision_available
-from ...utils.import_utils import requires
-from ...video_processing_utils import (
-    BaseVideoProcessor,
-)
-
-
-if is_vision_available():
-    from ...image_utils import PILImageResampling
+from ...video_processing_utils import BaseVideoProcessor
 
 
 class LlavaOnevisionFastVideoProcessorInitKwargs(VideosKwargs): ...
 
 
-@requires(backends=("torchvision",))
 class LlavaOnevisionVideoProcessor(BaseVideoProcessor):
     resample = PILImageResampling.BICUBIC
     image_mean = OPENAI_CLIP_MEAN
@@ -47,6 +35,7 @@ class LlavaOnevisionVideoProcessor(BaseVideoProcessor):
     do_rescale = True
     do_normalize = True
     do_convert_rgb = True
+    do_sample_frames = False  # Set to False for BC, recommended to set `True` in new models
     valid_kwargs = LlavaOnevisionFastVideoProcessorInitKwargs
     model_input_names = ["pixel_values_videos"]
 

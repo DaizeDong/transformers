@@ -19,7 +19,7 @@ rendered properly in your Markdown viewer.
 ## 개요[[overview]]
 
 
-DeBERTa 모델은 Pengcheng He, Xiaodong Liu, Jianfeng Gao, Weizhu Chen이 작성한 [DeBERTa: 분리된 어텐션을 활용한 디코딩 강화 BERT](https://arxiv.org/abs/2006.03654)이라는 논문에서 제안되었습니다. 이 모델은 2018년 Google이 발표한 BERT 모델과 2019년 Facebook이 발표한 RoBERTa 모델을 기반으로 합니다.
+DeBERTa 모델은 Pengcheng He, Xiaodong Liu, Jianfeng Gao, Weizhu Chen이 작성한 [DeBERTa: 분리된 어텐션을 활용한 디코딩 강화 BERT](https://huggingface.co/papers/2006.03654)이라는 논문에서 제안되었습니다. 이 모델은 2018년 Google이 발표한 BERT 모델과 2019년 Facebook이 발표한 RoBERTa 모델을 기반으로 합니다.
 DeBERTa는 RoBERTa에서 사용된 데이터의 절반만을 사용하여 분리된(disentangled) 어텐션과 향상된 마스크 디코더 학습을 통해 RoBERTa를 개선했습니다.
 
 논문의 초록은 다음과 같습니다:
@@ -115,38 +115,5 @@ DeBERTa를 시작하는 데 도움이 되는 Hugging Face와 community 자료 �
     - forward
 
 </pt>
-<tf>
-
-## TFDebertaModel[[transformers.TFDebertaModel]]
-
-[[autodoc]] TFDebertaModel
-    - call
-
-## TFDebertaPreTrainedModel[[transformers.TFDebertaPreTrainedModel]]
-
-[[autodoc]] TFDebertaPreTrainedModel
-    - call
-
-## TFDebertaForMaskedLM[[transformers.TFDebertaForMaskedLM]]
-
-[[autodoc]] TFDebertaForMaskedLM
-    - call
-
-## TFDebertaForSequenceClassification[[transformers.TFDebertaForSequenceClassification]]
-
-[[autodoc]] TFDebertaForSequenceClassification
-    - call
-
-## TFDebertaForTokenClassification[[transformers.TFDebertaForTokenClassification]]
-
-[[autodoc]] TFDebertaForTokenClassification
-    - call
-
-## TFDebertaForQuestionAnswering[[transformers.TFDebertaForQuestionAnswering]]
-
-[[autodoc]] TFDebertaForQuestionAnswering
-    - call
-
-</tf>
 </frameworkcontent>
 

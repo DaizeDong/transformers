@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import math
-from typing import List, Optional, Union
+from typing import Optional, Union
 
 import torch
 
@@ -23,24 +23,19 @@ from ...image_processing_utils_fast import (
     DefaultFastImageProcessorKwargs,
     Unpack,
 )
-from ...image_utils import ImageInput, SizeDict
+from ...image_utils import ImageInput, PILImageResampling, SizeDict
 from ...utils import (
     TensorType,
     auto_docstring,
-    is_torchvision_available,
     is_torchvision_v2_available,
-    is_vision_available,
     logging,
 )
 
 
-if is_vision_available():
-    from ...image_utils import PILImageResampling
-if is_torchvision_available():
-    if is_torchvision_v2_available():
-        from torchvision.transforms.v2 import functional as F
-    else:
-        from torchvision.transforms import functional as F
+if is_torchvision_v2_available():
+    from torchvision.transforms.v2 import functional as F
+else:
+    from torchvision.transforms import functional as F
 
 logger = logging.get_logger(__name__)
 
@@ -174,7 +169,7 @@ class Phi4MultimodalImageProcessorFast(BaseImageProcessorFast):
 
     def _preprocess(
         self,
-        images: List["torch.Tensor"],
+        images: list["torch.Tensor"],
         size: SizeDict,
         interpolation: Optional["F.InterpolationMode"],
         patch_size: int,
@@ -182,8 +177,8 @@ class Phi4MultimodalImageProcessorFast(BaseImageProcessorFast):
         do_rescale: bool,
         rescale_factor: Optional[float],
         do_normalize: bool,
-        image_mean: Optional[Union[float, List[float]]] = None,
-        image_std: Optional[Union[float, List[float]]] = None,
+        image_mean: Optional[Union[float, list[float]]] = None,
+        image_std: Optional[Union[float, list[float]]] = None,
         return_tensors: Optional[Union[str, TensorType]] = None,
         **kwargs,
     ):

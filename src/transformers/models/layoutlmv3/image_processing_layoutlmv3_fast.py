@@ -16,19 +16,15 @@
 
 from typing import Optional, Union
 
-from ...image_processing_utils_fast import (
-    BaseImageProcessorFast,
-    BatchFeature,
-    DefaultFastImageProcessorKwargs,
-)
+import torch
+
+from ...image_processing_utils_fast import BaseImageProcessorFast, BatchFeature, DefaultFastImageProcessorKwargs
 from ...image_transforms import ChannelDimension, group_images_by_shape, reorder_images
 from ...image_utils import IMAGENET_STANDARD_MEAN, IMAGENET_STANDARD_STD, ImageInput, PILImageResampling, SizeDict
 from ...processing_utils import Unpack
 from ...utils import (
     TensorType,
     auto_docstring,
-    is_torch_available,
-    is_torchvision_available,
     is_torchvision_v2_available,
     logging,
     requires_backends,
@@ -36,16 +32,12 @@ from ...utils import (
 from .image_processing_layoutlmv3 import apply_tesseract
 
 
+if is_torchvision_v2_available():
+    from torchvision.transforms.v2 import functional as F
+else:
+    from torchvision.transforms import functional as F
+
 logger = logging.get_logger(__name__)
-
-if is_torch_available():
-    import torch
-
-if is_torchvision_available():
-    if is_torchvision_v2_available():
-        from torchvision.transforms.v2 import functional as F
-    else:
-        from torchvision.transforms import functional as F
 
 
 class LayoutLMv3FastImageProcessorKwargs(DefaultFastImageProcessorKwargs):
@@ -106,6 +98,7 @@ class LayoutLMv3ImageProcessorFast(BaseImageProcessorFast):
         ocr_lang: Optional[str],
         tesseract_config: Optional[str],
         return_tensors: Optional[Union[str, TensorType]],
+        disable_grouping: Optional[bool],
         **kwargs,
     ) -> BatchFeature:
         # Tesseract OCR to get words + normalized bounding boxes
@@ -125,7 +118,7 @@ class LayoutLMv3ImageProcessorFast(BaseImageProcessorFast):
                 boxes_batch.append(boxes)
 
         # Group images by size for batched resizing
-        grouped_images, grouped_images_index = group_images_by_shape(images)
+        grouped_images, grouped_images_index = group_images_by_shape(images, disable_grouping=disable_grouping)
         resized_images_grouped = {}
         for shape, stacked_images in grouped_images.items():
             if do_resize:
@@ -135,7 +128,7 @@ class LayoutLMv3ImageProcessorFast(BaseImageProcessorFast):
 
         # Group images by size for further processing
         # Needed in case do_resize is False, or resize returns images with different sizes
-        grouped_images, grouped_images_index = group_images_by_shape(resized_images)
+        grouped_images, grouped_images_index = group_images_by_shape(resized_images, disable_grouping=disable_grouping)
         processed_images_grouped = {}
         for shape, stacked_images in grouped_images.items():
             if do_center_crop:
