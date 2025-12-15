@@ -37,6 +37,7 @@ from ...image_utils import (
     valid_images,
     validate_preprocess_arguments,
 )
+from ...processing_utils import ImagesKwargs
 from ...utils import TensorType, is_vision_available, logging
 
 
@@ -44,6 +45,11 @@ if is_vision_available():
     from PIL import Image
 
 logger = logging.get_logger(__name__)
+
+
+class Emu3ImageProcessorKwargs(ImagesKwargs, total=False):
+    ratio: str
+    image_area: int
 
 
 def smart_resize(
@@ -108,6 +114,7 @@ class Emu3ImageProcessor(BaseImageProcessor):
     """
 
     model_input_names = ["pixel_values", "image_sizes"]
+    valid_kwargs = Emu3ImageProcessorKwargs
 
     def __init__(
         self,
@@ -266,8 +273,8 @@ class Emu3ImageProcessor(BaseImageProcessor):
         """
 
         max_shape = (
-            max([size[0] for size in image_sizes]),
-            max([size[1] for size in image_sizes]),
+            max(size[0] for size in image_sizes),
+            max(size[1] for size in image_sizes),
         )
         pixel_values = [
             pad(
@@ -481,7 +488,7 @@ class Emu3ImageProcessor(BaseImageProcessor):
         image_mean: Union[float, Iterable[float]],
         image_std: Union[float, Iterable[float]],
         input_data_format: Optional[Union[str, ChannelDimension]] = None,
-    ) -> np.array:
+    ) -> np.ndarray:
         """
         Unnormalizes `image` using the mean and standard deviation specified by `mean` and `std`.
         image = (image * image_std) + image_mean

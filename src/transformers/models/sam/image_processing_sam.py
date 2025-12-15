@@ -37,6 +37,7 @@ from ...image_utils import (
     valid_images,
     validate_preprocess_arguments,
 )
+from ...processing_utils import ImagesKwargs
 from ...utils import (
     TensorType,
     filter_out_non_signature_kwargs,
@@ -55,6 +56,19 @@ if is_torchvision_available():
     from torchvision.ops.boxes import batched_nms
 
 logger = logging.get_logger(__name__)
+
+
+class SamImageProcessorKwargs(ImagesKwargs, total=False):
+    r"""
+    mask_size (`dict[str, int]`, *optional*):
+        The size `{"longest_edge": int}` to resize the segmentation maps to.
+    mask_pad_size (`dict[str, int]`, *optional*):
+        The size `{"height": int, "width": int}` to pad the segmentation maps to. Must be larger than any segmentation
+        map size provided for preprocessing.
+    """
+
+    mask_size: dict[str, int]
+    mask_pad_size: dict[str, int]
 
 
 class SamImageProcessor(BaseImageProcessor):
@@ -107,6 +121,7 @@ class SamImageProcessor(BaseImageProcessor):
     """
 
     model_input_names = ["pixel_values"]
+    valid_kwargs = SamImageProcessorKwargs
 
     def __init__(
         self,
@@ -691,7 +706,7 @@ class SamImageProcessor(BaseImageProcessor):
         Generates a list of crop boxes of different sizes. Each layer has (2**i)**2 boxes for the ith layer.
 
         Args:
-            image (`np.array`):
+            image (`np.ndarray`):
                 Input original image
             target_size (`int`):
                 Target size of the resized image
@@ -758,7 +773,7 @@ class SamImageProcessor(BaseImageProcessor):
                 List of IoU scores.
             original_size (`tuple[int,int]`):
                 Size of the original image.
-            cropped_box_image (`np.array`):
+            cropped_box_image (`np.ndarray`):
                 The cropped image.
             pred_iou_thresh (`float`, *optional*, defaults to 0.88):
                 The threshold for the iou scores.
@@ -807,7 +822,7 @@ class SamImageProcessor(BaseImageProcessor):
                 List of IoU scores.
             original_size (`tuple[int,int]`):
                 Size of the original image.
-            cropped_box_image (`np.array`):
+            cropped_box_image (`np.ndarray`):
                 The cropped image.
             pred_iou_thresh (`float`, *optional*, defaults to 0.88):
                 The threshold for the iou scores.
